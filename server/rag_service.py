@@ -75,32 +75,22 @@ Answer:
 
 
 def call_generation_model(prompt: str) -> str:
-    """
-    Send the final prompt to the configured generation model.
-
-    TODO:
-    - Send a POST request to the Ollama generation endpoint.
-    - Use Config.OLLAMA_BASE_URL.
-    - Use Config.GENERATION_MODEL.
-    - Use Config.TEMPERATURE.
-    - Request a non-streaming response.
-    - Return the generated response text.
-
-    Endpoint:
-        POST {OLLAMA_BASE_URL}/api/generate
-
-    Example request body:
-        {
+    response = requests.post(
+        f"{Config.OLLAMA_BASE_URL}/api/generate",
+        json={
             "model": Config.GENERATION_MODEL,
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": Config.TEMPERATURE
-            }
-        }
-    """
-    raise NotImplementedError("TODO: Call the configured generation model.")
+                "temperature": Config.TEMPERATURE,
+            },
+        },
+        timeout=120,
+    )
+    
+    response.raise_for_status()
 
+    return response.json().get("response", "").strip()
 
 def format_sources(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
